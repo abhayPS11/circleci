@@ -1,0 +1,38 @@
+version: 2.1
+
+jobs:
+  build-arm:
+    machine:
+      image: ubuntu-22.04:202310
+    resource_class: large
+    steps:
+      - checkout
+      - run:
+          name: Show Architecture
+          command: uname -m
+      - run:
+          name: Build App
+          command: |
+            echo "Building app for ARM64..."
+            # Add your build commands here
+  test-arm:
+    machine:
+      image: ubuntu-22.04:202310
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Run Tests
+          command: |
+            echo "Running tests on ARM64"
+            # Add your test commands here
+
+workflows:
+  version: 2
+  arm-workflow:
+    jobs:
+      - build-arm
+      - test-arm:
+          requires:
+            - build-arm
+
