@@ -1,6 +1,7 @@
 version: 2.1
 
 jobs:
+  # ARM-native build job
   build-arm:
     machine:
       image: ubuntu-22.04:202310
@@ -14,7 +15,9 @@ jobs:
           name: Build App
           command: |
             echo "Building app for ARM64..."
-            # Add your build commands here
+            # Add your actual build commands here
+
+  # ARM-native test job
   test-arm:
     machine:
       image: ubuntu-22.04:202310
@@ -24,15 +27,46 @@ jobs:
       - run:
           name: Run Tests
           command: |
-            echo "Running tests on ARM64"
+            echo "Running tests on ARM64..."
             # Add your test commands here
+
+  # Docker multi-arch build job
+  docker-build:
+    machine:
+      image: ubuntu-22.04:202310
+    resource_class: large
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Enable Docker Buildx
+          command: |
+            docker buildx create --use
+            docker buildx inspect --bootstrap
+      - run:
+          name: Login to Docker Hub
+          command: |
+            echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+      - run:
+          name: Build Multi-Arch Docker Image
+          command: |
+            docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              -t $DOCKERHUB_USER/demo-app:latest \
+              --push .
+      - run:
+          name: Verify Multi-Arch Image
+          command: docker buildx imagetools inspect $DOCKERHUB_USER/demo-app:latest
 
 workflows:
   version: 2
-  arm-workflow:
+  arm-docker-workflow:
     jobs:
       - build-arm
       - test-arm:
           requires:
             - build-arm
+      - docker-build:
+          requires:
+            - test-arm
 
