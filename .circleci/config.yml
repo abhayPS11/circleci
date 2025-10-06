@@ -1,11 +1,8 @@
 version: 2.1
 
 jobs:
-  # ARM-native build job
   build-arm:
-    machine:
-      image: ubuntu-22.04:202310
-    resource_class: large
+    machine: true   # Use native VM
     steps:
       - checkout
       - run:
@@ -15,13 +12,10 @@ jobs:
           name: Build App
           command: |
             echo "Building app for ARM64..."
-            # Add your actual build commands here
+            # Add your build commands here
 
-  # ARM-native test job
   test-arm:
-    machine:
-      image: ubuntu-22.04:202310
-    resource_class: medium
+    machine: true
     steps:
       - checkout
       - run:
@@ -30,11 +24,8 @@ jobs:
             echo "Running tests on ARM64..."
             # Add your test commands here
 
-  # Docker multi-arch build job
   docker-build:
-    machine:
-      image: ubuntu-22.04:202310
-    resource_class: large
+    machine: true
     steps:
       - checkout
       - setup_remote_docker
