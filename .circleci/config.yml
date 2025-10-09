@@ -2,7 +2,7 @@
 version: 2.1
 
 jobs:
-  test-arm-runner:
+  arm64-demo:
     machine: true
     resource_class: abhayps/arm64-linux
     steps:
@@ -18,8 +18,21 @@ jobs:
               echo "⚠️ Not running on ARM64!"
               exit 1
             fi
+      - run:
+          name: Build Docker Image
+          command: docker build -t arm64-node-demo .
+      - run:
+          name: Run Docker Container
+          command: docker run -d -p 3000:3000 arm64-node-demo
+      - run:
+          name: Test Endpoint
+          command: |
+            sleep 5
+            curl http://localhost:3000
 
 workflows:
-  test:
+  version: 2
+  arm64-workflow:
     jobs:
-      - test-arm-runner
+      - arm64-demo
+
