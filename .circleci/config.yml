@@ -1,16 +1,41 @@
-# .circleci/config.yml
 version: 2.1
 
 jobs:
-  test-arm-runner:
-    machine: true
-    resource_class: abhayps/arm64-linux
+  build-arm:
+    machine:
+      image: ubuntu-22.04:202310
+    resource_class: large
     steps:
       - checkout
-      - run: echo "✅ Running on SUSE ARM64 runner!"
+      - run:
+          name: Show Architecture
+          command: uname -m   # Should print aarch64 on ARM64 machine
+      - run:
+          name: Build App
+          command: |
+            echo "Building app for ARM64..."
+            # Example: Docker build for ARM64
+            docker build --platform linux/arm64 -t my-arm64-app .
+
+  test-arm:
+    machine:
+      image: ubuntu-22.04:202310
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Run Tests
+          command: |
+            echo "Running tests on ARM64..."
+            # Example: Run Node.js or Python tests
+            # npm test
+            # pytest
 
 workflows:
-  test:
+  version: 2
+  arm-workflow:
     jobs:
-      - test-arm-runner
-
+      - build-arm
+      - test-arm:
+          requires:
+            - build-arm
