@@ -13,9 +13,9 @@ jobs:
             ARCH=$(uname -m)
             echo "Detected architecture: $ARCH"
             if [ "$ARCH" = "aarch64" ]; then
-              echo "✅ Running on ARM64 architecture!"
+              echo "Running on ARM64 architecture!"
             else
-              echo "⚠️ Not running on ARM64!"
+              echo "Not running on ARM64!"
               exit 1
             fi
       - run:
